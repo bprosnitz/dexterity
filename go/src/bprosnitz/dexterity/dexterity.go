@@ -38,10 +38,57 @@ func readDex(r io.Reader, dex *Dex) error {
 
   dex.StringIds = make([]DexStringIdItem, dex.Header.StringIdsSize)
   for i := 0; i < int(dex.Header.StringIdsSize); i++ {
-    if err := read(r, &dex.StringIds[i]); err != nil {
+    if err := read(r, &dex.StringIds[i].StringDataOff); err != nil {
       return err
     }
   }
+
+  dex.TypeIds = make([]DexTypeIdItem, dex.Header.TypeIdsSize)
+  for i := 0; i < int(dex.Header.TypeIdsSize); i++ {
+    if err := read(r, &dex.TypeIds[i].DescriptorIdx); err != nil {
+      return err
+    }
+  }
+
+  dex.ProtoIds = make([]DexProtoIdItem, dex.Header.ProtoIdsSize)
+  for i := 0; i < int(dex.Header.ProtoIdsSize); i++ {
+    if err := read(r, &dex.ProtoIds[i].ShortyIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ProtoIds[i].ReturnTypeIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ProtoIds[i].ParametersOff); err != nil {
+      return err
+    }
+  }
+
+  dex.FieldIds = make([]DexFieldIdItem, dex.Header.FieldIdsSize)
+  for i := 0; i < int(dex.Header.FieldIdsSize); i++ {
+    if err := read(r, &dex.FieldIds[i].ClassIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.FieldIds[i].TypeIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.FieldIds[i].NameIdx); err != nil {
+      return err
+    }
+  }
+
+  dex.MethodIds = make([]DexMethodIdItem, dex.Header.MethodIdsSize)
+  for i := 0; i < int(dex.Header.MethodIdsSize); i++ {
+    if err := read(r, &dex.MethodIds[i].ClassIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.MethodIds[i].ProtoIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.MethodIds[i].NameIdx); err != nil {
+      return err
+    }
+  }
+
 
   return nil
 }
@@ -130,6 +177,10 @@ func readDexHeader(r io.Reader, header *DexHeader) error {
 type Dex struct {
   Header DexHeader
   StringIds []DexStringIdItem
+  TypeIds []DexTypeIdItem
+  ProtoIds []DexProtoIdItem
+  FieldIds []DexFieldIdItem
+  MethodIds []DexMethodIdItem
 }
 
 type DexHeader struct {
@@ -161,7 +212,41 @@ type DexStringIdItem struct {
   StringDataOff uint32
 }
 
+type DexTypeIdItem struct {
+  DescriptorIdx uint32
+}
+
+type DexProtoIdItem struct {
+  ShortyIdx uint32
+  ReturnTypeIdx uint32
+  ParametersOff uint32
+}
+
+type DexFieldIdItem struct {
+  ClassIdx uint16
+  TypeIdx uint16
+  NameIdx uint32
+}
+
+type DexMethodIdItem struct {
+  ClassIdx uint16
+  ProtoIdx uint16
+  NameIdx uint32
+}
+
 
 func read(r io.Reader, i interface{}) error {
     return binary.Read(r, binary.LittleEndian, i)
+}
+
+func consume(r io.Reader, n int) error {
+  b := make([]byte, n)
+  on, err := r.Read(b)
+  if err != nil {
+    return err
+  }
+  if on != n {
+    return fmt.Errorf("invalid number of bytes read")
+  }
+  return nil
 }
