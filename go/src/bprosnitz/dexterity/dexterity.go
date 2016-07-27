@@ -6,6 +6,7 @@ import (
   "log"
   "encoding/binary"
   "os"
+  "sort"
   "io"
 )
 
@@ -125,6 +126,7 @@ func readDex(r io.Reader, dex *Dex) error {
     }
   }
 
+  sort.Sort(dex.DataOffsets)
   return nil
 }
 
@@ -218,13 +220,25 @@ type Dex struct {
   MethodIds []DexMethodIdItem
   ClassDefs []DexClassDefItem
 
-  DataOffsets []DataOffset
+  DataOffsets DataOffsets
 }
 
 type DataOffset struct {
   Offset uint32
   StringItem *DexStringIdItem
   ClassDefItem *DexClassDefItem
+}
+
+type DataOffsets []DataOffset
+
+func (do DataOffsets) Len() int {
+  return len(do)
+}
+func (do DataOffsets) Less(i, j int) bool {
+  return do[i].Offset < do[j].Offset
+}
+func (do DataOffsets) Swap(i, j int) {
+  do[i], do[j] = do[j], do[i]
 }
 
 type DexHeader struct {
