@@ -41,6 +41,10 @@ func readDex(r io.Reader, dex *Dex) error {
     if err := read(r, &dex.StringIds[i].StringDataOff); err != nil {
       return err
     }
+    dex.DataOffsets = append(dex.DataOffsets, DataOffset{
+        Offset: dex.StringIds[i].StringDataOff,
+        StringItem: &dex.StringIds[i],
+      })
   }
 
   dex.TypeIds = make([]DexTypeIdItem, dex.Header.TypeIdsSize)
@@ -112,11 +116,15 @@ func readDex(r io.Reader, dex *Dex) error {
     if err := read(r, &dex.ClassDefs[i].ClassDataOff); err != nil {
       return err
     }
+    dex.DataOffsets = append(dex.DataOffsets, DataOffset{
+        Offset: dex.ClassDefs[i].ClassDataOff,
+        ClassDefItem: &dex.ClassDefs[i],
+      })
     if err := read(r, &dex.ClassDefs[i].StaticValuesOff); err != nil {
       return err
     }
   }
-  
+
   return nil
 }
 
@@ -209,6 +217,14 @@ type Dex struct {
   FieldIds []DexFieldIdItem
   MethodIds []DexMethodIdItem
   ClassDefs []DexClassDefItem
+
+  DataOffsets []DataOffset
+}
+
+type DataOffset struct {
+  Offset uint32
+  StringItem *DexStringIdItem
+  ClassDefItem *DexClassDefItem
 }
 
 type DexHeader struct {
