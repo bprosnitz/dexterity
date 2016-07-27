@@ -89,7 +89,34 @@ func readDex(r io.Reader, dex *Dex) error {
     }
   }
 
-
+  dex.ClassDefs = make([]DexClassDefItem, dex.Header.ClassDefsSize)
+  for i := 0; i < int(dex.Header.ClassDefsSize); i++ {
+    if err := read(r, &dex.ClassDefs[i].ClassIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].AccessFlags); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].SuperclassIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].InterfacesOff); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].SourceFileIdx); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].AnnotationsOff); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].ClassDataOff); err != nil {
+      return err
+    }
+    if err := read(r, &dex.ClassDefs[i].StaticValuesOff); err != nil {
+      return err
+    }
+  }
+  
   return nil
 }
 
@@ -181,6 +208,7 @@ type Dex struct {
   ProtoIds []DexProtoIdItem
   FieldIds []DexFieldIdItem
   MethodIds []DexMethodIdItem
+  ClassDefs []DexClassDefItem
 }
 
 type DexHeader struct {
@@ -234,6 +262,16 @@ type DexMethodIdItem struct {
   NameIdx uint32
 }
 
+type DexClassDefItem struct {
+  ClassIdx uint32
+  AccessFlags uint32
+  SuperclassIdx uint32
+  InterfacesOff uint32
+  SourceFileIdx uint32
+  AnnotationsOff uint32
+  ClassDataOff uint32
+  StaticValuesOff uint32
+}
 
 func read(r io.Reader, i interface{}) error {
     return binary.Read(r, binary.LittleEndian, i)
