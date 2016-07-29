@@ -187,3 +187,72 @@ func readDexHeader(r io.Reader, header *DexHeader) error {
 
   return nil
 }
+
+func readDexClassDefData(r io.Reader, cd *DexClassDefData) error {
+  staticFieldsSize, err := readUleb(r)
+  if err != nil {
+    return err
+  }
+  instanceFieldSize, err := readUleb(r)
+  if err != nil {
+    return err
+  }
+  directMethodsSize, err := readUleb(r)
+  if err != nil {
+    return err
+  }
+  virtualMethodsSize, err := readUleb(r)
+  if err != nil {
+    return err
+  }
+
+  cd.StaticFields = make([]DexEncodedField, staticFieldsSize)
+  for i := range cd.StaticFields {
+    if err := readEncodedField(&cd.StaticFields[i]); err != nil {
+      return err
+    }
+  }
+  cd.InstanceFields = make([]DexEncodedField, instanceFieldSize)
+  for i := range cd.InstanceFields {
+    if err := readEncodedField(&cd.InstanceFields[i]); err != nil {
+      return err
+    }
+  }
+  cd.DirectMethods = make([]DexEncodedField, directMethodsSize)
+  for i := range cd.DirectMethods {
+    if err := readEncodedField(&cd.DirectMethods[i]); err != nil {
+      return err
+    }
+  }
+  cd.VirtualMethods = make([]DexEncodedField, virtualMethodsSize)
+  for i := range cd.VirtualMethods {
+    if err := readEncodedField(&cd.VirtualMethods[i]); err != nil {
+      return err
+    }
+  }
+  return nil
+}
+
+func readEncodedField(r io.Reader, ef *DexEncodedField) error {
+  var err error
+  ef.FieldIdxDiff, err = readUleb(r)
+  if err != nil {
+    return err
+  }
+  ef.AccessFlags, err = readUleb(r)
+  return err
+}
+
+func readEncodedMethod(r io.Reader, ef *DexEncodedMethod) error {
+  var err error
+  ef.MethodIdxDiff, err = readUleb(r)
+  if err != nil {
+    return err
+  }
+  ef.AccessFlags, err = readUleb(r)
+  if err != nil {
+    return err
+  }
+  ef.CodeOff, err = readUleb(r)
+  return err
+}

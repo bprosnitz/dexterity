@@ -91,3 +91,21 @@ type DexClassDefItem struct {
   ClassDataOff uint32
   StaticValuesOff uint32
 }
+
+type DexClassDefData struct {
+  StaticFields []DexEncodedField
+  InstanceFields []DexEncodedField
+  DirectMethods []DexEncodedMethod
+  VirtualMethods []DexEncodedMethod
+}
+
+type DexEncodedField struct {
+  FieldIdxDiff uint32
+  AccessFlags uint32
+}
+
+type DexEncodedMethod struct {
+  MethodIdxDiff uint32
+  AccessFlags uint32
+  CodeOff uint32
+}
