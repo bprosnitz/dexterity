@@ -18,7 +18,7 @@ func readUleb(r io.Reader) (uint32, error) {
       return 0, fmt.Errorf("expected to read 1 byte, but read none")
     }
     hasNext = b[0] & 0x80 != 0
-    value |= uint32(b[0]) << shiftAmt
+    value |= uint32(b[0] & 0x7f) << shiftAmt
     shiftAmt += 7
   }
   return value, nil
@@ -43,7 +43,7 @@ func readSleb(r io.Reader) (int32, error) {
     }
     hasNext = b[0] & 0x80 != 0
     signBit = b[0] & 0x40 != 0
-    value |= uint32(b[0]) << shiftAmt
+    value |= uint32(b[0] & 0x7f) << shiftAmt
     shiftAmt += 7
   }
   if signBit {
