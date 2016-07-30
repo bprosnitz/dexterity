@@ -8,8 +8,6 @@ type Dex struct {
   FieldIds []DexFieldIdItem
   MethodIds []DexMethodIdItem
   ClassDefs []DexClassDefItem
-
-  DataOffsets DataOffsets
 }
 
 type DataOffset struct {
@@ -31,6 +29,7 @@ func (do DataOffsets) Swap(i, j int) {
 }
 
 type DexHeader struct {
+  Magic [8]byte
   Checksum uint32
   Signature [20]byte
   FileSize uint32

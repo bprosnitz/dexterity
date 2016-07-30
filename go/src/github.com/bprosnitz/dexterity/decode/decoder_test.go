@@ -32,7 +32,9 @@ type mutf8 struct {
 }
 
 type ptr struct {
+  A uint32
   P *ptrElem
+  B uint32
 }
 
 type ptrElem struct {
@@ -66,9 +68,9 @@ func TestDecode(t *testing.T) {
       final: &sizeList{2, 1, []uint32{3, 4}, []uint32{5}},
     },
     {
-      input: []byte{5, 0, 0, 0, 0, 1, 0, 0, 0},
+      input: []byte{1, 0, 0, 0, 13, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0},
       empty: &ptr{},
-      final: &ptr{&ptrElem{1}},
+      final: &ptr{1, &ptrElem{2}, 3},
     },
   }
   for _, test := range tests {
