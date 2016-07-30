@@ -55,15 +55,3 @@ func readSleb(r io.Reader) (int32, error) {
 func read(r io.Reader, i interface{}) error {
     return binary.Read(r, binary.LittleEndian, i)
 }
-
-func consume(r io.Reader, n int) error {
-  b := make([]byte, n)
-  on, err := r.Read(b)
-  if err != nil {
-    return err
-  }
-  if on != n {
-    return fmt.Errorf("invalid number of bytes read")
-  }
-  return nil
-}
