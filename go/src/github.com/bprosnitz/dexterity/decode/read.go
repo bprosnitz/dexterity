@@ -62,6 +62,12 @@ func readUint32(r io.Reader) (uint32, error) {
   return u, err
 }
 
+func readUint16(r io.Reader) (uint16, error) {
+  var u uint16
+  err := read(r, &u)
+  return u, err
+}
+
 func readMutf8(r io.Reader) (string, error) {
   // TODO(bprosnitz) Fully support MUTF-8 modifications
   b := make([]byte, 1)

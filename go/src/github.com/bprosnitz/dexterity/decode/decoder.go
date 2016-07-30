@@ -38,6 +38,13 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
     rv.SetUint(uint64(b[0]))
     return nil
+  case uint16:
+    v, err := readUint16(d.r)
+    if err != nil {
+      return err
+    }
+    rv.SetUint(uint64(v))
+    return nil
   case uint32:
     v, err := readUint32(d.r)
     if err != nil {

@@ -1,13 +1,17 @@
 package dexterity
 
+import (
+  "github.com/bprosnitz/dexterity/decode"
+)
+
 type Dex struct {
   Header DexHeader
-  StringIds []DexStringIdItem
-  TypeIds []DexTypeIdItem
-  ProtoIds []DexProtoIdItem
-  FieldIds []DexFieldIdItem
-  MethodIds []DexMethodIdItem
-  ClassDefs []DexClassDefItem
+  StringIds []DexStringIdItem `sizetag:"StringIds"`
+  TypeIds []DexTypeIdItem `sizetag:"TypeIds"`
+  ProtoIds []DexProtoIdItem `sizetag:"ProtoIds"`
+  FieldIds []DexFieldIdItem `sizetag:"FieldIds"`
+  MethodIds []DexMethodIdItem `sizetag:"MethodIds"`
+  ClassDefs []DexClassDefItem `sizetag:"ClassDefs"`
 }
 
 type DataOffset struct {
@@ -38,17 +42,17 @@ type DexHeader struct {
   LinkSize uint32
   LinkOff uint32
   MapOff uint32
-  StringIdsSize uint32
+  StringIdsSize decode.Size `sizetag:"StringIds"`
   StringIdsOff uint32
-  TypeIdsSize uint32
+  TypeIdsSize decode.Size `sizetag:"TypeIds"`
   TypeIdsOff uint32
-  ProtoIdsSize uint32
+  ProtoIdsSize decode.Size `sizetag:"ProtoIds"`
   ProtoIdsOff uint32
-  FieldIdsSize uint32
+  FieldIdsSize decode.Size `sizetag:"FieldIds"`
   FieldIdsOff uint32
-  MethodIdsSize uint32
+  MethodIdsSize decode.Size `sizetag:"MethodIds"`
   MethodIdsOff uint32
-  ClassDefsSize uint32
+  ClassDefsSize decode.Size `sizetag:"ClassDefs"`
   ClassDefsOff uint32
   DataSize uint32
   DataOff uint32
