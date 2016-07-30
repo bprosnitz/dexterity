@@ -40,7 +40,7 @@ func TestDecode(t *testing.T) {
     {
       input: []byte{0x80, 0x7f, 0x80, 0x7f, 0x80, 0x7f},
       empty: &lebs{},
-      final: &lebs{127, 126, -128},
+      final: &lebs{16256, 16255, -128},
     },
     {
       input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0},
