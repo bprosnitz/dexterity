@@ -12,7 +12,7 @@ func TestReadUleb(t *testing.T) {
       outputErr bool
     }{
       {
-        input: []byte{},
+        input: []byte{},  
         outputErr: true,
       },
       {
