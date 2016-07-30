@@ -41,6 +41,11 @@ type ptrElem struct {
   A uint32
 }
 
+type array struct {
+  A [2]uint32
+  B [3]uint8
+}
+
 func TestDecode(t *testing.T) {
   tests := []struct{
     input []byte
@@ -71,6 +76,11 @@ func TestDecode(t *testing.T) {
       input: []byte{1, 0, 0, 0, 13, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0},
       empty: &ptr{},
       final: &ptr{1, &ptrElem{2}, 3},
+    },
+    {
+      input: []byte{1, 0, 0, 0, 2, 0, 0, 0, 3, 4, 5},
+      empty: &array{},
+      final: &array{[2]uint32{1,2},[3]uint8{3,4,5}},
     },
   }
   for _, test := range tests {

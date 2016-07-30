@@ -31,6 +31,13 @@ type decoder struct {
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
   rt := rv.Type()
   switch rv.Interface().(type) {
+  case uint8:
+    var b [1]byte
+    if _, err := d.r.Read(b[:]); err != nil {
+      return err
+    }
+    rv.SetUint(uint64(b[0]))
+    return nil
   case uint32:
     v, err := readUint32(d.r)
     if err != nil {
@@ -80,6 +87,13 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     return nil
   }
   switch rt.Kind() {
+  case reflect.Array:
+    for i := 0; i < rt.Len(); i++ {
+      if err := d.Decode(rv.Index(i), ""); err != nil {
+        return err
+      }
+    }
+    return nil
   case reflect.Slice:
       sizetag := tag.Get("sizetag")
       if sizetag == "" {
