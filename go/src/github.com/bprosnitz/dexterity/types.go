@@ -57,6 +57,12 @@ type DexHeader struct {
 
 type DexStringIdItem struct {
   StringDataOff uint32
+  StringData DexStringData
+}
+
+type DexStringData struct {
+  Utf16Size uint32
+  Value string
 }
 
 type DexTypeIdItem struct {

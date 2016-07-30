@@ -5,7 +5,7 @@ import (
   "log"
   "os"
   "fmt"
-  "bprosnitz/dexterity"
+  "github.com/bprosnitz/dexterity"
 )
 
 func main() {
@@ -20,7 +20,8 @@ func main() {
     log.Fatal(err)
   }
   dex := &dexterity.Dex{}
-  if err := dexterity.ReadDex(f, dex); err != nil {
+  //if err := dexterity.ReadDex(f, dex); err != nil {
+  if err := dexterity.Process(f, 0, dex); err != nil {
     log.Fatal(err)
   }
   fmt.Printf("%#v\n", dex)

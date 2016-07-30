@@ -56,6 +56,12 @@ func read(r io.Reader, i interface{}) error {
     return binary.Read(r, binary.LittleEndian, i)
 }
 
+func readUint32(r io.Reader) (uint32, error) {
+  var u uint32
+  err := read(r, &u)
+  return u, err
+}
+
 func readMutf8(r io.Reader) (string, error) {
   // TODO(bprosnitz) Fully support MUTF-8 modifications
   b := make([]byte, 1)

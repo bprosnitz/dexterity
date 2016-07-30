@@ -8,6 +8,50 @@ import (
 
 const dexMagic = "dex\n035\000"
 
+func Process(r io.ReadSeeker, offset uint32, value interface{}) error {
+//  if offset != 0xffffffff {
+    origOffset, _ := r.Seek(0, 1)
+    defer r.Seek(origOffset, 0)
+    if _, err := r.Seek(int64(offset), 0); err != nil {
+      return err
+    }
+
+  switch x := value.(type) {
+  case *Dex:
+    if err := readDexHeader(r, &x.Header); err != nil {
+      return err
+    }
+    x.StringIds = make([]DexStringIdItem, x.Header.StringIdsSize)
+    for i := 0; i < int(x.Header.StringIdsSize); i++ {
+    //  offsetHere, _ := r.Seek(0, 1)
+      //fmt.Printf("offsetHere: %v\n", offsetHere)
+    //  x.StringIds[i]
+  /*    if err := Process(r, 0xffffffff, &x.StringIds[i]); err != nil {
+        return err
+      }
+    //  r.Seek(offsetHere + 4, 0)
+    }
+  case *DexStringIdItem:*/
+    if err := read(r, &x.StringIds[i].StringDataOff); err != nil {
+      return err
+    }
+    if err := Process(r, offset, &x.StringIds[i].StringData); err != nil {
+      return err
+    }
+  }
+  case *DexStringData:
+    if err := read(r, &x.Utf16Size); err != nil {
+      return err
+    }
+    str, err := readMutf8(r)
+    if err != nil {
+      return err
+    }
+    x.Value = str
+  }
+  return nil
+}
+
 func ReadDex(r io.Reader, dex *Dex) error {
   err := readDexHeader(r, &dex.Header)
   if err != nil {
@@ -187,8 +231,8 @@ func readDexHeader(r io.Reader, header *DexHeader) error {
 
   return nil
 }
-
-func readDexClassDefData(r io.ReaderSeeker, offset uint32, cd *DexClassDefData) error {
+/*
+func readDexClassDefData(r io.ReadSeeker, offset uint32, cd *DexClassDefData) error {
   if _, err := r.Seek(int64(offset), 0); err != nil {
     return err
   }
@@ -259,3 +303,4 @@ func readEncodedMethod(r io.Reader, ef *DexEncodedMethod) error {
   ef.CodeOff, err = readUleb(r)
   return err
 }
+*/
