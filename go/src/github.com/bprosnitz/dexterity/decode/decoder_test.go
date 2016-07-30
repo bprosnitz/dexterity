@@ -26,6 +26,14 @@ type sizeList struct {
   BList []uint32 `sizetag:"B"`
 }
 
+type ptr struct {
+  P *ptrElem
+}
+
+type ptrElem struct {
+  A uint32
+}
+
 func TestDecode(t *testing.T) {
   tests := []struct{
     input []byte
@@ -46,6 +54,11 @@ func TestDecode(t *testing.T) {
       input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0},
       empty: &sizeList{},
       final: &sizeList{2, 1, []uint32{3, 4}, []uint32{5}},
+    },
+    {
+      input: []byte{5, 0, 0, 0, 0, 1, 0, 0, 0},
+      empty: &ptr{},
+      final: &ptr{&ptrElem{1}},
     },
   }
   for _, test := range tests {

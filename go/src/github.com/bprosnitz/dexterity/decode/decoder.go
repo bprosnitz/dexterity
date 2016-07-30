@@ -16,23 +16,19 @@ func Decode(r io.ReadSeeker, x interface{}) error {
     r: r,
     sizes: map[string]uint32{},
   }
-  return d.Decode(reflect.ValueOf(x), "")
-}
-
-type decoderStackEntry struct {
-  pos int
+  rv := reflect.ValueOf(x)
+  for rv.Kind() == reflect.Ptr {
+    rv = rv.Elem()
+  }
+  return d.Decode(rv, "")
 }
 
 type decoder struct {
   r io.ReadSeeker
   sizes map[string]uint32
-  stack []decoderStackEntry
 }
 
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
-  for rv.Kind() == reflect.Ptr {
-    rv = rv.Elem()
-  }
   rt := rv.Type()
   switch rv.Interface().(type) {
   case uint32:
@@ -99,6 +95,22 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
         return err
       }
     }
+    return nil
+  case reflect.Ptr:
+    offset, err := readUint32(d.r)
+    if err != nil {
+      return err
+    }
+    origOffset, _ := d.r.Seek(0, 1)
+    if _, err := d.r.Seek(int64(offset), 0); err != nil {
+      return err
+    }
+    childRv := reflect.New(rt.Elem())
+    rv.Set(childRv)
+    if err := d.Decode(childRv.Elem(), tag); err != nil {
+      return err
+    }
+    d.r.Seek(origOffset, 0)
     return nil
   }
   return fmt.Errorf("unhandled type: %v", rt)
