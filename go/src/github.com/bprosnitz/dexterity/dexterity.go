@@ -188,7 +188,10 @@ func readDexHeader(r io.Reader, header *DexHeader) error {
   return nil
 }
 
-func readDexClassDefData(r io.Reader, cd *DexClassDefData) error {
+func readDexClassDefData(r io.ReaderSeeker, offset uint32, cd *DexClassDefData) error {
+  if _, err := r.Seek(int64(offset), 0); err != nil {
+    return err
+  }
   staticFieldsSize, err := readUleb(r)
   if err != nil {
     return err
