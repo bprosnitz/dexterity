@@ -4,8 +4,8 @@ import (
   "flag"
   "log"
   "os"
-  "fmt"
   "github.com/bprosnitz/dexterity"
+   "github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -24,6 +24,6 @@ func main() {
 //  if err := dexterity.Process(f, 0, dex); err != nil {
     log.Fatal(err)
   }
-  fmt.Printf("%#v\n", dex)
+  spew.Printf("%#v\n", dex)
   f.Close()
 }

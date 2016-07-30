@@ -59,12 +59,11 @@ type DexHeader struct {
 }
 
 type DexStringIdItem struct {
-  StringDataOff uint32
-  StringData DexStringData
+  StringData *DexStringData
 }
 
 type DexStringData struct {
-  Utf16Size uint32
+  Utf16Size decode.Uleb
   Value string
 }
 
