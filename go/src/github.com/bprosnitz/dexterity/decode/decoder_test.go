@@ -26,6 +26,11 @@ type sizeList struct {
   BList []uint32 `sizetag:"B"`
 }
 
+type mutf8 struct {
+  A string
+  B string
+}
+
 type ptr struct {
   P *ptrElem
 }
@@ -49,6 +54,11 @@ func TestDecode(t *testing.T) {
       input: []byte{0x80, 0x7f, 0x80, 0x7f, 0x80, 0x7f},
       empty: &lebs{},
       final: &lebs{16256, 16255, -128},
+    },
+    {
+      input: []byte{0x61, 0x62, 0x63, 0x00, 0x61, 0x62, 0x00},
+      empty: &mutf8{},
+      final: &mutf8{"abc", "ab"},
     },
     {
       input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0},

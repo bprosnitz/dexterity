@@ -71,6 +71,13 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     rv.SetUint(uint64(v))
     d.sizes[sizetag] = v
     return nil
+  case string:
+    v, err := readMutf8(d.r)
+    if err != nil {
+      return err
+    }
+    rv.SetString(v)
+    return nil
   }
   switch rt.Kind() {
   case reflect.Slice:
