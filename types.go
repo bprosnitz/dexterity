@@ -54,7 +54,7 @@ type DexTypeIdItem struct {
 type DexProtoIdItem struct {
   ShortyIdx uint32
   ReturnTypeIdx uint32
-  ParametersOff uint32
+  Parameters *DexTypeList
 }
 
 type DexFieldIdItem struct {
@@ -73,11 +73,11 @@ type DexClassDefItem struct {
   ClassIdx uint32
   AccessFlags uint32
   SuperclassIdx uint32
-  InterfacesOff *DexTypeList
+  Interfaces *DexTypeList
   SourceFileIdx uint32
-  AnnotationsOff *DexAnnotationsDirectoryItem
-  ClassDataOff *DexClassDefData
-  StaticValuesOff *DexEncodedArray
+  Annotations *DexAnnotationsDirectoryItem
+  ClassData *DexClassDefData
+  StaticValues *DexEncodedArray
 }
 
 type DexClassDefData struct {
@@ -92,7 +92,7 @@ type DexClassDefData struct {
 }
 
 type DexAnnotationsDirectoryItem struct {
-  ClassAnnotationsOff uint32
+  ClassAnnotations *DexAnnotationSet
   FieldSize uint32 `listsize:"AnnotationFields"`
   AnnotatedMethodsSize uint32 `listsize:"AnnotationMethods"`
   AnnotationParametersSize uint32 `listsize:"AnnotationParameters"`
@@ -108,17 +108,17 @@ type DexAnnotationSet struct {
 
 type DexFieldAnnotation struct {
   FieldIdx uint32
-  AnnotationsOff uint32
+  Annotations *DexAnnotationSet
 }
 
 type DexMethodAnnotation struct {
   MethodIdx uint32
-  AnnotationsOff uint32
+  Annotations *DexAnnotationSet
 }
 
 type DexParameterAnnotations struct {
   MethodIdx uint32
-  AnnotationsOff uint32
+  Annotations *DexAnnotationSet
 }
 
 type DexAnnotationItem struct {
@@ -148,11 +148,6 @@ type DexAnnotationElement struct {
   Value DexEncodedValue
 }
 
-type DexEncodedValue struct {
-  T uint8
-  V []byte
-}
-
 type DexTypeList struct {
   Size uint32 `listsize:"TypeItems"`
   Items []DexTypeItem `listtag:"TypeItems"`
@@ -167,6 +162,15 @@ type DexTypeItem struct {
   TypeIdx uint16
 }
 
+type DexCodeItem struct {
+  
+}
+
+type DexEncodedValue struct {
+  T uint8
+  V []byte
+}
+
 func (ev *DexEncodedValue) Read(r io.Reader) error {
-panic("S")
+  panic("not yet implemented")
 }

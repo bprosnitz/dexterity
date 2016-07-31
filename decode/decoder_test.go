@@ -24,7 +24,6 @@ type list struct {
   B uint32 `listsize:"B"`
   AList []uint32 `listtag:"A"`
   BList []uint32 `listtag:"B"`
-  ARef *uint32 `listindex:"A"`
 }
 
 type mutf8 struct {
@@ -70,9 +69,9 @@ func TestDecode(t *testing.T) {
       final: &mutf8{"abc", "ab"},
     },
     {
-      input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0},
+      input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0},
       empty: &list{},
-      final: &list{2, 1, []uint32{3, 4}, []uint32{5}, uint32Ptr(4)},
+      final: &list{2, 1, []uint32{3, 4}, []uint32{5}},
     },
     {
       input: []byte{1, 0, 0, 0, 17, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
@@ -94,9 +93,4 @@ func TestDecode(t *testing.T) {
       t.Errorf("%#v: got %#v, want %#v", test.input, test.empty, test.final)
     }
   }
-}
-
-
-func uint32Ptr(v uint32) *uint32 {
-  return &v
 }

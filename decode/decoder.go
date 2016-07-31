@@ -17,7 +17,6 @@ type CustomReader interface {
 func Decode(r io.ReadSeeker, x interface{}) error {
   d := decoder{
     r: r,
-    lists: map[string]reflect.Value{},
   }
   rv := reflect.ValueOf(x)
   for rv.Kind() == reflect.Ptr {
@@ -33,8 +32,6 @@ type decoderStackEntry struct {
 type decoder struct {
   r io.ReadSeeker
   stack []decoderStackEntry
-  // TODO(bprosnitz) Figure out how to handle list indicies. There are problems on and off stack.
-  lists map[string]reflect.Value
 }
 
 func (d *decoder) pop() {
@@ -148,7 +145,6 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
           return err
         }
       }
-      d.lists[listtag] = rv
       return nil
   case reflect.Struct:
     d.push()
@@ -163,16 +159,6 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     x, err := readUint32(d.r)
     if err != nil {
       return err
-    }
-
-    listindex := tag.Get("listindex")
-    if listindex != "" {
-      l, ok := d.lists[listindex]
-      if !ok {
-        return fmt.Errorf("unable to find list with tag %q", listindex)
-      }
-      rv.Set(l.Index(int(x)).Addr())
-      return nil
     }
 
     // If no index, this is an offset.
