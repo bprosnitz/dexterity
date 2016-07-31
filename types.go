@@ -163,7 +163,32 @@ type DexTypeItem struct {
 }
 
 type DexCodeItem struct {
-  
+  RegistersSize uint16
+  InsSize uint16
+  OutsSize uint16
+  TriesSize uint16 `listsize:"Tries"`
+  DebugInfoOff uint32
+  InsnsSize uint32 `listsize:"Insns"`
+  Insns []uint16 `listtag:"Insns"`
+  // padding 2 byte if not 4 byte aligned
+  // TODO(bprosnitz) support this
+  Tries []DexTryItem
+  // Handlers are references from handler
+}
+
+type DexTryItem struct {
+  StartAddr uint32
+  InsnCount uint16
+  HandlerOff uint16
+}
+
+type DexEncodedCatchHandlerList struct {
+  Size decode.Uleb `listsize:"EncodedCatchHandlers"`
+  Handlers []DexEncodedCatchHandler `listtag:"EncodedCatchHandlers"`
+}
+
+type DexEncodedCatchHandler struct {
+  // Custom decode logic
 }
 
 type DexEncodedValue struct {
