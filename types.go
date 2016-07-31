@@ -29,31 +29,13 @@ type Dex struct {
   ClassDefsOff uint32
   DataSize uint32
   DataOff uint32
-  
+
   StringIds []DexStringIdItem `listtag:"StringIds"`
   TypeIds []DexTypeIdItem `listtag:"TypeIds"`
   ProtoIds []DexProtoIdItem `listtag:"ProtoIds"`
   FieldIds []DexFieldIdItem `listtag:"FieldIds"`
   MethodIds []DexMethodIdItem `listtag:"MethodIds"`
   ClassDefs []DexClassDefItem `listtag:"ClassDefs"`
-}
-
-type DataOffset struct {
-  Offset uint32
-  StringItem *DexStringIdItem
-  ClassDefItem *DexClassDefItem
-}
-
-type DataOffsets []DataOffset
-
-func (do DataOffsets) Len() int {
-  return len(do)
-}
-func (do DataOffsets) Less(i, j int) bool {
-  return do[i].Offset < do[j].Offset
-}
-func (do DataOffsets) Swap(i, j int) {
-  do[i], do[j] = do[j], do[i]
 }
 
 type DexStringIdItem struct {
