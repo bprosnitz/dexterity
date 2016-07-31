@@ -17,7 +17,6 @@ type CustomReader interface {
 func Decode(r io.ReadSeeker, x interface{}) error {
   d := decoder{
     r: r,
-    sizes: map[string]uint32{},
     lists: map[string]reflect.Value{},
   }
   rv := reflect.ValueOf(x)
@@ -27,10 +26,38 @@ func Decode(r io.ReadSeeker, x interface{}) error {
   return d.Decode(rv, "")
 }
 
+type decoderStackEntry struct {
+  sizes map[string]uint32
+}
+
 type decoder struct {
   r io.ReadSeeker
-  sizes map[string]uint32
+  stack []decoderStackEntry
+  // TODO(bprosnitz) Figure out how to handle list indicies. There are problems on and off stack.
   lists map[string]reflect.Value
+}
+
+func (d *decoder) pop() {
+  d.stack = d.stack[:len(d.stack) - 1]
+}
+
+func (d *decoder) push() {
+  d.stack = append(d.stack, decoderStackEntry{
+    sizes: map[string]uint32{},
+  })
+}
+
+func (d *decoder) lookupSize(name string) (uint32, bool) {
+  for i := len(d.stack) - 1; i >= 0; i-- {
+    if v, ok := d.stack[i].sizes[name]; ok {
+      return v, true
+    }
+  }
+  return 0, false
+}
+
+func (d *decoder) setSize(name string, v uint32) {
+  d.stack[len(d.stack) - 1].sizes[name] = v
 }
 
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
@@ -61,7 +88,7 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
     listsize := tag.Get("listsize")
     if listsize != "" {
-      d.sizes[listsize] = v
+      d.setSize(listsize, v)
     }
     rv.SetUint(uint64(v))
     return nil
@@ -72,7 +99,7 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
     listsize := tag.Get("listsize")
     if listsize != "" {
-      d.sizes[listsize] = v
+      d.setSize(listsize, v)
     }
     rv.SetUint(uint64(v))
     return nil
@@ -111,7 +138,7 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
       if listtag == "" {
         return fmt.Errorf("missing listtag on slice")
       }
-      size, ok := d.sizes[listtag]
+      size, ok := d.lookupSize(listtag)
       if !ok {
         return fmt.Errorf("missing matching sizetag definition")
       }
@@ -124,11 +151,13 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
       d.lists[listtag] = rv
       return nil
   case reflect.Struct:
+    d.push()
     for i := 0; i < rv.NumField(); i++ {
       if err := d.Decode(rv.Field(i), rt.Field(i).Tag); err != nil {
         return err
       }
     }
+    d.pop()
     return nil
   case reflect.Ptr:
     x, err := readUint32(d.r)

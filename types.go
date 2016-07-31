@@ -6,7 +6,30 @@ import (
 )
 
 type Dex struct {
-  Header DexHeader
+  Magic [8]byte
+  Checksum uint32
+  Signature [20]byte
+  FileSize uint32
+  HeaderSize uint32
+  EndianTag uint32
+  LinkSize uint32
+  LinkOff uint32
+  MapOff uint32
+  StringIdsSize uint32 `listsize:"StringIds"`
+  StringIdsOff uint32
+  TypeIdsSize uint32 `listsize:"TypeIds"`
+  TypeIdsOff uint32
+  ProtoIdsSize uint32 `listsize:"ProtoIds"`
+  ProtoIdsOff uint32
+  FieldIdsSize uint32 `listsize:"FieldIds"`
+  FieldIdsOff uint32
+  MethodIdsSize uint32 `listsize:"MethodIds"`
+  MethodIdsOff uint32
+  ClassDefsSize uint32 `listsize:"ClassDefs"`
+  ClassDefsOff uint32
+  DataSize uint32
+  DataOff uint32
+  
   StringIds []DexStringIdItem `listtag:"StringIds"`
   TypeIds []DexTypeIdItem `listtag:"TypeIds"`
   ProtoIds []DexProtoIdItem `listtag:"ProtoIds"`
@@ -31,32 +54,6 @@ func (do DataOffsets) Less(i, j int) bool {
 }
 func (do DataOffsets) Swap(i, j int) {
   do[i], do[j] = do[j], do[i]
-}
-
-type DexHeader struct {
-  Magic [8]byte
-  Checksum uint32
-  Signature [20]byte
-  FileSize uint32
-  HeaderSize uint32
-  EndianTag uint32
-  LinkSize uint32
-  LinkOff uint32
-  MapOff uint32
-  StringIdsSize uint32 `listsize:"StringIds"`
-  StringIdsOff uint32
-  TypeIdsSize uint32 `listsize:"TypeIds"`
-  TypeIdsOff uint32
-  ProtoIdsSize uint32 `listsize:"ProtoIds"`
-  ProtoIdsOff uint32
-  FieldIdsSize uint32 `listsize:"FieldIds"`
-  FieldIdsOff uint32
-  MethodIdsSize uint32 `listsize:"MethodIds"`
-  MethodIdsOff uint32
-  ClassDefsSize uint32 `listsize:"ClassDefs"`
-  ClassDefsOff uint32
-  DataSize uint32
-  DataOff uint32
 }
 
 type DexStringIdItem struct {
