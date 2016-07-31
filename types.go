@@ -1,6 +1,7 @@
 package dexterity
 
 import (
+  "io"
   "github.com/bprosnitz/dexterity/decode"
 )
 
@@ -95,7 +96,7 @@ type DexClassDefItem struct {
   SuperclassIdx uint32
   InterfacesOff uint32
   SourceFileIdx uint32
-  AnnotationsOff uint32
+  AnnotationsOff *DexAnnotationsDirectoryItem
   ClassDataOff *DexClassDefData
   StaticValuesOff uint32
 }
@@ -111,6 +112,36 @@ type DexClassDefData struct {
   VirtualMethods []DexEncodedMethod `listtag:"VirtualMethods"`
 }
 
+type DexAnnotationsDirectoryItem struct {
+  ClassAnnotationsOff uint32
+  FieldSize uint32 `listsize:"AnnotationFields"`
+  AnnotatedMethodsSize uint32 `listsize:"AnnotationMethods"`
+  AnnotationParametersSize uint32 `listsize:"AnnotationParameters"`
+  FieldAnnotations []DexFieldAnnotation `listtag:"AnnotationFields"`
+  MethodAnnotations []DexMethodAnnotation `listtag:"AnnotationMethods"`
+  ParameterAnnotations []DexParameterAnnotations `listtag:"AnnotationParameters"`
+}
+
+type DexFieldAnnotation struct {
+  FieldIdx uint32
+  AnnotationsOff uint32
+}
+
+type DexMethodAnnotation struct {
+  MethodIdx uint32
+  AnnotationsOff uint32
+}
+
+type DexParameterAnnotations struct {
+  MethodIdx uint32
+  AnnotationsOff uint32
+}
+
+type DexAnnotationItem struct {
+  Visibility uint8
+  Annotation DexEncodedAnnotation
+}
+
 type DexEncodedField struct {
   FieldIdxDiff decode.Uleb
   AccessFlags decode.Uleb
@@ -120,4 +151,24 @@ type DexEncodedMethod struct {
   MethodIdxDiff decode.Uleb
   AccessFlags decode.Uleb
   CodeOff decode.Uleb
+}
+
+type DexEncodedAnnotation struct {
+  TypeIdx decode.Uleb
+  Size decode.Uleb `listsize:"AnnotationElements"`
+  Elements []DexAnnotationElement `listtag:"AnnotationElements"`
+}
+
+type DexAnnotationElement struct {
+  NameIdx decode.Uleb
+  Value DexEncodedValue
+}
+
+type DexEncodedValue struct {
+  T uint8
+  V []byte
+}
+
+func (ev *DexEncodedValue) Read(r io.Reader) error {
+panic("S")
 }

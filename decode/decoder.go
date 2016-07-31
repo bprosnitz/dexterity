@@ -10,6 +10,10 @@ type Uleb uint32
 type Ulebp1 uint32
 type Sleb int32
 
+type CustomReader interface {
+  Read(r io.Reader) error
+}
+
 func Decode(r io.ReadSeeker, x interface{}) error {
   d := decoder{
     r: r,
@@ -30,6 +34,10 @@ type decoder struct {
 }
 
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
+  if cr, ok := rv.Interface().(CustomReader); ok {
+    return cr.Read(d.r)
+  }
+
   rt := rv.Type()
   switch rv.Interface().(type) {
   case uint8:
