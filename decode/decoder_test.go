@@ -19,11 +19,12 @@ type lebs struct {
   C decode.Sleb
 }
 
-type sizeList struct {
+type list struct {
   A decode.Size `listsize:"A"`
   B decode.Size `listsize:"B"`
   AList []uint32 `listtag:"A"`
   BList []uint32 `listtag:"B"`
+  ARef *uint32 `listindex:"A"`
 }
 
 type mutf8 struct {
@@ -68,9 +69,9 @@ func TestDecode(t *testing.T) {
       final: &mutf8{"abc", "ab"},
     },
     {
-      input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0},
-      empty: &sizeList{},
-      final: &sizeList{2, 1, []uint32{3, 4}, []uint32{5}},
+      input: []byte{2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0},
+      empty: &list{},
+      final: &list{2, 1, []uint32{3, 4}, []uint32{5}, uint32Ptr(4)},
     },
     {
       input: []byte{1, 0, 0, 0, 13, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0},
@@ -92,4 +93,9 @@ func TestDecode(t *testing.T) {
       t.Errorf("%#v: got %#v, want %#v", test.input, test.empty, test.final)
     }
   }
+}
+
+
+func uint32Ptr(v uint32) *uint32 {
+  return &v
 }

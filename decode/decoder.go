@@ -15,6 +15,7 @@ func Decode(r io.ReadSeeker, x interface{}) error {
   d := decoder{
     r: r,
     sizes: map[string]uint32{},
+    lists: map[string]reflect.Value{},
   }
   rv := reflect.ValueOf(x)
   for rv.Kind() == reflect.Ptr {
@@ -26,6 +27,7 @@ func Decode(r io.ReadSeeker, x interface{}) error {
 type decoder struct {
   r io.ReadSeeker
   sizes map[string]uint32
+  lists map[string]reflect.Value
 }
 
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
@@ -116,6 +118,7 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
           return err
         }
       }
+      d.lists[listtag] = rv
       return nil
   case reflect.Struct:
     for i := 0; i < rv.NumField(); i++ {
@@ -125,12 +128,24 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
     return nil
   case reflect.Ptr:
-    offset, err := readUint32(d.r)
+    x, err := readUint32(d.r)
     if err != nil {
       return err
     }
+
+    listindex := tag.Get("listindex")
+    if listindex != "" {
+      l, ok := d.lists[listindex]
+      if !ok {
+        return fmt.Errorf("unable to find list with tag %q", listindex)
+      }
+      rv.Set(l.Index(int(x)).Addr())
+      return nil
+    }
+
+    // If no index, this is an offset.
     origOffset, _ := d.r.Seek(0, 1)
-    if _, err := d.r.Seek(int64(offset), 0); err != nil {
+    if _, err := d.r.Seek(int64(x), 0); err != nil {
       return err
     }
     childRv := reflect.New(rt.Elem())
