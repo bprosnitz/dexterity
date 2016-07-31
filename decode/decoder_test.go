@@ -3,6 +3,7 @@ package decode_test
 import (
   "testing"
   "reflect"
+  "io"
   "bytes"
   "github.com/bprosnitz/dexterity/decode"
 )
@@ -47,6 +48,20 @@ type array struct {
   B [3]uint8
 }
 
+type custom uint32
+
+func (c *custom) Read(r io.Reader, h decode.Helper) error {
+  if v, ok := h.LookupSize("A"); ok {
+    *c = custom(v)
+  }
+  return nil
+}
+
+type customTest struct {
+  A uint32 `listsize:"A"`
+  Custom custom
+}
+
 func TestDecode(t *testing.T) {
   tests := []struct{
     input []byte
@@ -82,6 +97,11 @@ func TestDecode(t *testing.T) {
       input: []byte{1, 0, 0, 0, 2, 0, 0, 0, 3, 4, 5},
       empty: &array{},
       final: &array{[2]uint32{1,2},[3]uint8{3,4,5}},
+    },
+    {
+      input: []byte{5, 0, 0, 0},
+      empty: &customTest{},
+      final: &customTest{5, 5},
     },
   }
   for _, test := range tests {

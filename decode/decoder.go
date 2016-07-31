@@ -11,7 +11,11 @@ type Ulebp1 uint32
 type Sleb int32
 
 type CustomReader interface {
-  Read(r io.Reader) error
+  Read(r io.Reader, h Helper) error
+}
+
+type Helper interface {
+  LookupSize(name string) (uint32, bool)
 }
 
 func Decode(r io.ReadSeeker, x interface{}) error {
@@ -44,7 +48,7 @@ func (d *decoder) push() {
   })
 }
 
-func (d *decoder) lookupSize(name string) (uint32, bool) {
+func (d *decoder) LookupSize(name string) (uint32, bool) {
   for i := len(d.stack) - 1; i >= 0; i-- {
     if v, ok := d.stack[i].sizes[name]; ok {
       return v, true
@@ -58,8 +62,8 @@ func (d *decoder) setSize(name string, v uint32) {
 }
 
 func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
-  if cr, ok := rv.Interface().(CustomReader); ok {
-    return cr.Read(d.r)
+  if cr, ok := rv.Addr().Interface().(CustomReader); ok {
+    return cr.Read(d.r, d)
   }
 
   rt := rv.Type()
@@ -135,7 +139,7 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
       if listtag == "" {
         return fmt.Errorf("missing listtag on slice")
       }
-      size, ok := d.lookupSize(listtag)
+      size, ok := d.LookupSize(listtag)
       if !ok {
         return fmt.Errorf("missing matching sizetag definition")
       }
