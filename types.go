@@ -94,7 +94,7 @@ type DexClassDefItem struct {
   ClassIdx uint32
   AccessFlags uint32
   SuperclassIdx uint32
-  InterfacesOff uint32
+  InterfacesOff *DexTypeList
   SourceFileIdx uint32
   AnnotationsOff *DexAnnotationsDirectoryItem
   ClassDataOff *DexClassDefData
@@ -167,6 +167,15 @@ type DexAnnotationElement struct {
 type DexEncodedValue struct {
   T uint8
   V []byte
+}
+
+type DexTypeList struct {
+  Size uint32 `listsize:"TypeItems"`
+  Items []DexTypeItem `listtag:"TypeItems"`
+}
+
+type DexTypeItem struct {
+  TypeIdx uint16
 }
 
 func (ev *DexEncodedValue) Read(r io.Reader) error {
