@@ -20,8 +20,8 @@ type lebs struct {
 }
 
 type list struct {
-  A decode.Size `listsize:"A"`
-  B decode.Size `listsize:"B"`
+  A uint32 `listsize:"A"`
+  B uint32 `listsize:"B"`
   AList []uint32 `listtag:"A"`
   BList []uint32 `listtag:"B"`
   ARef *uint32 `listindex:"A"`

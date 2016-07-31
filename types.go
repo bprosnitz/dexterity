@@ -42,17 +42,17 @@ type DexHeader struct {
   LinkSize uint32
   LinkOff uint32
   MapOff uint32
-  StringIdsSize decode.Size `listsize:"StringIds"`
+  StringIdsSize uint32 `listsize:"StringIds"`
   StringIdsOff uint32
-  TypeIdsSize decode.Size `listsize:"TypeIds"`
+  TypeIdsSize uint32 `listsize:"TypeIds"`
   TypeIdsOff uint32
-  ProtoIdsSize decode.Size `listsize:"ProtoIds"`
+  ProtoIdsSize uint32 `listsize:"ProtoIds"`
   ProtoIdsOff uint32
-  FieldIdsSize decode.Size `listsize:"FieldIds"`
+  FieldIdsSize uint32 `listsize:"FieldIds"`
   FieldIdsOff uint32
-  MethodIdsSize decode.Size `listsize:"MethodIds"`
+  MethodIdsSize uint32 `listsize:"MethodIds"`
   MethodIdsOff uint32
-  ClassDefsSize decode.Size `listsize:"ClassDefs"`
+  ClassDefsSize uint32 `listsize:"ClassDefs"`
   ClassDefsOff uint32
   DataSize uint32
   DataOff uint32
@@ -96,15 +96,19 @@ type DexClassDefItem struct {
   InterfacesOff uint32
   SourceFileIdx uint32
   AnnotationsOff uint32
-  ClassDataOff uint32
+  ClassDataOff *DexClassDefData
   StaticValuesOff uint32
 }
 
 type DexClassDefData struct {
-  StaticFields []DexEncodedField
-  InstanceFields []DexEncodedField
-  DirectMethods []DexEncodedMethod
-  VirtualMethods []DexEncodedMethod
+  StaticFieldsSize decode.Uleb `listsize:"StaticFields"`
+  InstanceFieldSize decode.Uleb `listsize:"InstanceFields"`
+  DirectMethodsSize decode.Uleb `listsize:"DirectMethods"`
+  VirtualMethodsSize decode.Uleb `listsize:"VirtualMethods"`
+  StaticFields []DexEncodedField `listtag:"StaticFields"`
+  InstanceFields []DexEncodedField `listtag:"InstanceFields"`
+  DirectMethods []DexEncodedMethod `listtag:"DirectMethods"`
+  VirtualMethods []DexEncodedMethod `listtag:"VirtualMethods"`
 }
 
 type DexEncodedField struct {

@@ -9,7 +9,6 @@ import (
 type Uleb uint32
 type Ulebp1 uint32
 type Sleb int32
-type Size uint32
 
 func Decode(r io.ReadSeeker, x interface{}) error {
   d := decoder{
@@ -52,12 +51,20 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     if err != nil {
       return err
     }
+    listsize := tag.Get("listsize")
+    if listsize != "" {
+      d.sizes[listsize] = v
+    }
     rv.SetUint(uint64(v))
     return nil
   case Uleb:
     v, err := readUleb(d.r)
     if err != nil {
       return err
+    }
+    listsize := tag.Get("listsize")
+    if listsize != "" {
+      d.sizes[listsize] = v
     }
     rv.SetUint(uint64(v))
     return nil
@@ -74,18 +81,6 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
       return err
     }
     rv.SetInt(int64(v))
-    return nil
-  case Size:
-    listsize := tag.Get("listsize")
-    if listsize == "" {
-      return fmt.Errorf("missing listsize on size")
-    }
-    v, err := readUint32(d.r)
-    if err != nil {
-      return err
-    }
-    rv.SetUint(uint64(v))
-    d.sizes[listsize] = v
     return nil
   case string:
     v, err := readMutf8(d.r)
