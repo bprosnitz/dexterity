@@ -112,12 +112,12 @@ type DexClassDefData struct {
 }
 
 type DexEncodedField struct {
-  FieldIdxDiff uint32
-  AccessFlags uint32
+  FieldIdxDiff decode.Uleb
+  AccessFlags decode.Uleb
 }
 
 type DexEncodedMethod struct {
-  MethodIdxDiff uint32
-  AccessFlags uint32
-  CodeOff uint32
+  MethodIdxDiff decode.Uleb
+  AccessFlags decode.Uleb
+  CodeOff decode.Uleb
 }
