@@ -98,7 +98,7 @@ type DexClassDefItem struct {
   SourceFileIdx uint32
   AnnotationsOff *DexAnnotationsDirectoryItem
   ClassDataOff *DexClassDefData
-  StaticValuesOff uint32
+  StaticValuesOff *DexEncodedArray
 }
 
 type DexClassDefData struct {
@@ -120,6 +120,11 @@ type DexAnnotationsDirectoryItem struct {
   FieldAnnotations []DexFieldAnnotation `listtag:"AnnotationFields"`
   MethodAnnotations []DexMethodAnnotation `listtag:"AnnotationMethods"`
   ParameterAnnotations []DexParameterAnnotations `listtag:"AnnotationParameters"`
+}
+
+type DexAnnotationSet struct {
+  Size uint32 `listsize:"AnnotationSet"`
+  Items []*DexAnnotationItem `listtag:"AnnotationSet"`
 }
 
 type DexFieldAnnotation struct {
@@ -172,6 +177,11 @@ type DexEncodedValue struct {
 type DexTypeList struct {
   Size uint32 `listsize:"TypeItems"`
   Items []DexTypeItem `listtag:"TypeItems"`
+}
+
+type DexEncodedArray struct {
+  Size decode.Uleb `listsize:"ArrayItems"`
+  Values []DexEncodedValue `listtag:"ArrayItems"`
 }
 
 type DexTypeItem struct {
