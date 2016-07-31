@@ -36,6 +36,7 @@ type ptr struct {
   A uint32
   P *ptrElem
   B uint32
+  NilPtr *ptrElem
 }
 
 type ptrElem struct {
@@ -74,9 +75,9 @@ func TestDecode(t *testing.T) {
       final: &list{2, 1, []uint32{3, 4}, []uint32{5}, uint32Ptr(4)},
     },
     {
-      input: []byte{1, 0, 0, 0, 13, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0},
+      input: []byte{1, 0, 0, 0, 17, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0},
       empty: &ptr{},
-      final: &ptr{1, &ptrElem{2}, 3},
+      final: &ptr{1, &ptrElem{2}, 3, nil},
     },
     {
       input: []byte{1, 0, 0, 0, 2, 0, 0, 0, 3, 4, 5},

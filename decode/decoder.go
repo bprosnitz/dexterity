@@ -139,6 +139,10 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
 
     // If no index, this is an offset.
+    if x == 0 {
+      // nil pointer
+      return nil
+    }
     origOffset, _ := d.r.Seek(0, 1)
     if _, err := d.r.Seek(int64(x), 0); err != nil {
       return err
