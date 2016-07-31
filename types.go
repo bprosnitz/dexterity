@@ -6,12 +6,12 @@ import (
 
 type Dex struct {
   Header DexHeader
-  StringIds []DexStringIdItem `sizetag:"StringIds"`
-  TypeIds []DexTypeIdItem `sizetag:"TypeIds"`
-  ProtoIds []DexProtoIdItem `sizetag:"ProtoIds"`
-  FieldIds []DexFieldIdItem `sizetag:"FieldIds"`
-  MethodIds []DexMethodIdItem `sizetag:"MethodIds"`
-  ClassDefs []DexClassDefItem `sizetag:"ClassDefs"`
+  StringIds []DexStringIdItem `listtag:"StringIds"`
+  TypeIds []DexTypeIdItem `listtag:"TypeIds"`
+  ProtoIds []DexProtoIdItem `listtag:"ProtoIds"`
+  FieldIds []DexFieldIdItem `listtag:"FieldIds"`
+  MethodIds []DexMethodIdItem `listtag:"MethodIds"`
+  ClassDefs []DexClassDefItem `listtag:"ClassDefs"`
 }
 
 type DataOffset struct {
@@ -42,17 +42,17 @@ type DexHeader struct {
   LinkSize uint32
   LinkOff uint32
   MapOff uint32
-  StringIdsSize decode.Size `sizetag:"StringIds"`
+  StringIdsSize decode.Size `listsize:"StringIds"`
   StringIdsOff uint32
-  TypeIdsSize decode.Size `sizetag:"TypeIds"`
+  TypeIdsSize decode.Size `listsize:"TypeIds"`
   TypeIdsOff uint32
-  ProtoIdsSize decode.Size `sizetag:"ProtoIds"`
+  ProtoIdsSize decode.Size `listsize:"ProtoIds"`
   ProtoIdsOff uint32
-  FieldIdsSize decode.Size `sizetag:"FieldIds"`
+  FieldIdsSize decode.Size `listsize:"FieldIds"`
   FieldIdsOff uint32
-  MethodIdsSize decode.Size `sizetag:"MethodIds"`
+  MethodIdsSize decode.Size `listsize:"MethodIds"`
   MethodIdsOff uint32
-  ClassDefsSize decode.Size `sizetag:"ClassDefs"`
+  ClassDefsSize decode.Size `listsize:"ClassDefs"`
   ClassDefsOff uint32
   DataSize uint32
   DataOff uint32

@@ -74,16 +74,16 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     rv.SetInt(int64(v))
     return nil
   case Size:
-    sizetag := tag.Get("sizetag")
-    if sizetag == "" {
-      return fmt.Errorf("missing sizetag on size")
+    listsize := tag.Get("listsize")
+    if listsize == "" {
+      return fmt.Errorf("missing listsize on size")
     }
     v, err := readUint32(d.r)
     if err != nil {
       return err
     }
     rv.SetUint(uint64(v))
-    d.sizes[sizetag] = v
+    d.sizes[listsize] = v
     return nil
   case string:
     v, err := readMutf8(d.r)
@@ -102,11 +102,11 @@ func (d *decoder) Decode(rv reflect.Value, tag reflect.StructTag) error {
     }
     return nil
   case reflect.Slice:
-      sizetag := tag.Get("sizetag")
-      if sizetag == "" {
-        return fmt.Errorf("missing sizetag on slice")
+      listtag := tag.Get("listtag")
+      if listtag == "" {
+        return fmt.Errorf("missing listtag on slice")
       }
-      size, ok := d.sizes[sizetag]
+      size, ok := d.sizes[listtag]
       if !ok {
         return fmt.Errorf("missing matching sizetag definition")
       }

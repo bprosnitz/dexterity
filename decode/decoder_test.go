@@ -20,10 +20,10 @@ type lebs struct {
 }
 
 type sizeList struct {
-  A decode.Size `sizetag:"A"`
-  B decode.Size `sizetag:"B"`
-  AList []uint32 `sizetag:"A"`
-  BList []uint32 `sizetag:"B"`
+  A decode.Size `listsize:"A"`
+  B decode.Size `listsize:"B"`
+  AList []uint32 `listtag:"A"`
+  BList []uint32 `listtag:"B"`
 }
 
 type mutf8 struct {
