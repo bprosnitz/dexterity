@@ -2,6 +2,7 @@ package dexterity
 
 import (
   "io"
+  "fmt"
   "github.com/bprosnitz/dexterity/decode"
 )
 
@@ -162,6 +163,26 @@ type DexTypeItem struct {
   TypeIdx uint16
 }
 
+type padding struct {}
+
+func (p padding) Read(r io.Reader, h decode.Helper) error {
+  tries, ok := h.LookupSize("Tries")
+  if !ok {
+    return fmt.Errorf("missing Tries annotation")
+  }
+  insns, ok := h.LookupSize("Insns")
+  if !ok {
+    return fmt.Errorf("missing Insns annotation")
+  }
+  if tries > 0 && insns % 2 == 1 {
+    b := make([]byte, 2)
+    r.Read(b) // read padding
+  }
+  return nil
+}
+
+var _ decode.CustomReader = (*padding)(nil)
+
 type DexCodeItem struct {
   RegistersSize uint16
   InsSize uint16
@@ -170,9 +191,8 @@ type DexCodeItem struct {
   DebugInfoOff uint32
   InsnsSize uint32 `listsize:"Insns"`
   Insns []uint16 `listtag:"Insns"`
-  // padding 2 byte if not 4 byte aligned
-  // TODO(bprosnitz) support this
-  Tries []DexTryItem
+  padding padding
+  Tries []DexTryItem `listtag:"Tries"`
   // Handlers are references from handler
 }
 
